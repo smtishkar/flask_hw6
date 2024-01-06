@@ -1,5 +1,6 @@
 import sqlalchemy
 
+
 metadata = sqlalchemy.MetaData()
 
 users = sqlalchemy.Table(
@@ -37,7 +38,8 @@ orders = sqlalchemy.Table(
     sqlalchemy.Column('id', sqlalchemy.Integer, primary_key=True),
     sqlalchemy.Column('user_id', sqlalchemy.Integer, sqlalchemy.ForeignKey('users.id'), nullable=False),
     sqlalchemy.Column('goods_id', sqlalchemy.Integer, sqlalchemy.ForeignKey('goods.id'), nullable=False),
-    sqlalchemy.Column('date', sqlalchemy.DateTime, nullable=False),
+    # sqlalchemy.Column('date', sqlalchemy.DateTime, nullable=False),
+    sqlalchemy.Column('date', sqlalchemy.String(50), nullable=False),
     sqlalchemy.Column('status', sqlalchemy.String(50), nullable=False)
     # id = sqlalchemy.Column('id', sqlalchemy.Integer, primary_key=True),
     # user_id = sqlalchemy.Column('user_id', sqlalchemy.Integer, sqlalchemy.ForeignKey('users.id'), nullable=False),

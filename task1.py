@@ -16,6 +16,8 @@ from pydantic_models import User, UserIn, Order, OrderIn, Goods, GoodsIn
 from sqlalchemy_models import users, goods, orders, metadata
 from sqlalchemy import create_engine, select, insert, update, delete, MetaData
 from fastapi import FastAPI
+from random import randint, choice
+import datetime
 
 DATABASE_URL = 'sqlite:///shop.db'
 
@@ -53,3 +55,11 @@ async def create_note(count: int):
         query = goods.insert().values(name=f'name {i}', description=f'description {i}', price=f'{10* (i+1)}')
         await database.execute(query)
     return {'message': f'{count} fake goods created'}
+
+
+@app.get("/fake_orders/{count}")
+async def create_note(count: int):
+    for i in range(count):
+        query = orders.insert().values(user_id=f'user_id {randint(0,10)}', goods_id=f'goods_id {randint(0,10)}', date=f'2024-01-{i+1}', status= f'{choice(["in progress", "done", "canceled"])}')            
+        await database.execute(query)
+    return {'message': f'{count} fake orders created'}
