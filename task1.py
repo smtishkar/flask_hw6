@@ -80,3 +80,19 @@ async def read_users():
 async def read_users():
     query = goods.select()
     return await database.fetch_all(query)
+
+@app.get('/users/{user_id}', response_model=User)
+async def read_user(user_id: int):
+    query = users.select().where(users.c.id == user_id)
+    return await database.fetch_one(query)
+
+@app.get('/orders/{order_id}', response_model=Order)
+async def read_user(order_id: int):
+    query = orders.select().where(orders.c.id == order_id)
+    return await database.fetch_one(query)
+
+
+@app.get('/goods/{goods_id}', response_model=Goods)
+async def read_user(goods_id: int):
+    query = goods.select().where(goods.c.id == goods_id)
+    return await database.fetch_one(query)
