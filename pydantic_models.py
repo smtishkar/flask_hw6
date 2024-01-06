@@ -32,7 +32,8 @@ class Order(BaseModel):
 class OrderIn(BaseModel):
     user_id: int
     goods_id: int
-    date: datetime = Field(default=datetime.now(), description='date')
+    # date: datetime = Field(default=datetime.now(), description='date')
+    date: str = Field(..., description='date')
     status: str
 
 class Goods(BaseModel):

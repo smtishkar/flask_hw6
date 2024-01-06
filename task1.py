@@ -96,3 +96,37 @@ async def read_user(order_id: int):
 async def read_user(goods_id: int):
     query = goods.select().where(goods.c.id == goods_id)
     return await database.fetch_one(query)
+
+@app.post('/users/', response_model=User)
+async def create_user(user: UserIn):
+    query = users.insert().values(
+        name=user.name,
+        surname=user.surname,
+        email=user.email,
+        password=user.password
+        )
+    last_record_id = await database.execute(query)
+    return {**user.dict(), 'id': last_record_id}
+
+
+@app.post('/orders/', response_model=Order)
+async def create_order(order: OrderIn):
+    query = orders.insert().values(
+        user_id=order.user_id,
+        goods_id=order.goods_id,
+        date=order.date,
+        status=order.status
+        )
+    last_record_id = await database.execute(query)
+    return {**order.dict(), 'id': last_record_id}
+
+
+@app.post('/goods/', response_model=Goods)
+async def create_good(good: GoodsIn):
+    query = goods.insert().values(
+        name=good.name,
+        description=good.description,
+        price=good.price
+        )
+    last_record_id = await database.execute(query)
+    return {**good.dict(), 'id': last_record_id}
