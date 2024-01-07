@@ -97,13 +97,13 @@ async def read_user(user_id: int):
 
 
 @app.get('/orders/{order_id}', response_model=Order)
-async def read_user(order_id: int):
+async def read_orders(order_id: int):
     query = orders.select().where(orders.c.id == order_id)
     return await database.fetch_one(query)
 
 
 @app.get('/goods/{goods_id}', response_model=Goods)
-async def read_user(goods_id: int):
+async def read_goods(goods_id: int):
     query = goods.select().where(goods.c.id == goods_id)
     return await database.fetch_one(query)
 
