@@ -30,30 +30,35 @@ metadata.create_all(engine)
 app = FastAPI()
 
 
-
 @app.on_event("startup")
 async def startup():
     await database.connect()
+
 
 @app.on_event("shutdown")
 async def shutdown():
     await database.disconnect()
 
+
 @app.get('/')
 async def root():
     return {"message": "Welcome to my shop"}
 
+
 @app.get("/fake_users/{count}")
 async def create_note(count: int):
     for i in range(count):
-        query = users.insert().values(name=f'user{i}', surname=f'surname{i}', email=f'mail{i}@mail.ru', password=f'password{i}')
+        query = users.insert().values(
+            name=f'user{i}', surname=f'surname{i}', email=f'mail{i}@mail.ru', password=f'password{i}')
         await database.execute(query)
     return {'message': f'{count} fake users created'}
+
 
 @app.get("/fake_goods/{count}")
 async def create_note(count: int):
     for i in range(count):
-        query = goods.insert().values(name=f'name {i}', description=f'description {i}', price=f'{10* (i+1)}')
+        query = goods.insert().values(
+            name=f'name {i}', description=f'description {i}', price=f'{10* (i+1)}')
         await database.execute(query)
     return {'message': f'{count} fake goods created'}
 
@@ -61,7 +66,8 @@ async def create_note(count: int):
 @app.get("/fake_orders/{count}")
 async def create_note(count: int):
     for i in range(count):
-        query = orders.insert().values(user_id=randint(0,10), goods_id=randint(0,10), date=f'2024-01-{i+1}', status= f'{choice(["in progress", "done", "canceled"])}')            
+        query = orders.insert().values(user_id=randint(0, 10), goods_id=randint(0, 10),
+                                       date=f'2024-01-{i+1}', status=f'{choice(["in progress", "done", "canceled"])}')
         await database.execute(query)
     return {'message': f'{count} fake orders created'}
 
@@ -71,20 +77,24 @@ async def read_users():
     query = users.select()
     return await database.fetch_all(query)
 
+
 @app.get('/orders/', response_model=List[Order])
 async def read_users():
     query = orders.select()
     return await database.fetch_all(query)
+
 
 @app.get('/goods/', response_model=List[Goods])
 async def read_users():
     query = goods.select()
     return await database.fetch_all(query)
 
+
 @app.get('/users/{user_id}', response_model=User)
 async def read_user(user_id: int):
     query = users.select().where(users.c.id == user_id)
     return await database.fetch_one(query)
+
 
 @app.get('/orders/{order_id}', response_model=Order)
 async def read_user(order_id: int):
@@ -97,6 +107,7 @@ async def read_user(goods_id: int):
     query = goods.select().where(goods.c.id == goods_id)
     return await database.fetch_one(query)
 
+
 @app.post('/users/', response_model=User)
 async def create_user(user: UserIn):
     query = users.insert().values(
@@ -104,7 +115,7 @@ async def create_user(user: UserIn):
         surname=user.surname,
         email=user.email,
         password=user.password
-        )
+    )
     last_record_id = await database.execute(query)
     return {**user.dict(), 'id': last_record_id}
 
@@ -116,7 +127,7 @@ async def create_order(order: OrderIn):
         goods_id=order.goods_id,
         date=order.date,
         status=order.status
-        )
+    )
     last_record_id = await database.execute(query)
     return {**order.dict(), 'id': last_record_id}
 
@@ -127,6 +138,48 @@ async def create_good(good: GoodsIn):
         name=good.name,
         description=good.description,
         price=good.price
-        )
+    )
     last_record_id = await database.execute(query)
     return {**good.dict(), 'id': last_record_id}
+
+
+@app.put('/users/{user_id}', response_model=User)
+async def update_user(user_id: int, new_user: UserIn):
+    query = users.update().where(users.c.id == user_id).values(**new_user.dict())
+    await database.execute(query)
+    return {**new_user.dict(), 'id': user_id}
+
+
+@app.put('/goods/{thing}', response_model=Goods)
+async def update_product(thing: int, new_thing: GoodsIn):
+    query = goods.update().where(goods.c.id == thing).values(**new_thing.dict())
+    await database.execute(query)
+    return {**new_thing.dict(), 'id': thing}
+
+
+@app.put('/orders/{order_id}', response_model=Order)
+async def update_order(order_id: int, new_order: OrderIn):
+    query = orders.update().where(orders.c.id == order_id).values(**new_order.dict())
+    await database.execute(query)
+    return {**new_order.dict(), 'id': order_id}
+
+
+@app.delete('/users/{user_id}')
+async def delete_user(user_id: int):
+    query = users.delete().where(users.c.id == user_id)
+    await database.execute(query)
+    return {'message': f'User {user_id} has been deleted'}
+
+
+@app.delete('/goods/{thing_id}')
+async def delete_product(thing_id: int):
+    query = goods.delete().where(goods.c.id == thing_id)
+    await database.execute(query)
+    return {'message': f'Thing {thing_id} has been deleted'}
+
+
+@app.delete('/orders/{order_id}')
+async def delete_order(order_id: int):
+    query = orders.delete().where(orders.c.id == order_id)
+    await database.execute(query)
+    return {'message': f'Order {order_id} has been deleted'}
